@@ -8,6 +8,7 @@ export function usePokemonDetail(id: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Garde-fou contre une mise à jour d'état après démontage du composant
     let annule = false;
 
     async function charger() {
@@ -34,6 +35,7 @@ export function usePokemonDetail(id: string) {
     return () => {
       annule = true;
     };
+    // [id] et non [] : sans ça, passer de Bulbasaur à Charmander garderait les anciennes données
   }, [id]);
 
   return { data, loading, error };

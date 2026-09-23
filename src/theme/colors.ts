@@ -15,6 +15,7 @@ export const grayscale = {
 // Texte toujours blanc sur ces couleurs (choix produit) : Bug, Electric, Fairy, Fire,
 // Flying, Normal, Grass, Ground, Ice, Psychic, Rock, Steel, Water ne passent pas le
 // contraste WCAG AA (4.5:1) avec du texte blanc — vérifié le 2026-09-22, accepté tel quel.
+// Record<PokemonType, ...> oblige à définir les 18 types : s'il en manque un, refus de compiler
 export const typeColors: Record<PokemonType, string> = {
   bug: "#A7B723",
   dark: "#75574C",

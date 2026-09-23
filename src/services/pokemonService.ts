@@ -16,29 +16,39 @@ const NOMS_STATS: Record<string, string> = {
   speed: "SPD",
 };
 
+// L'API ne donne pas l'id dans les listes, seulement une URL ".../pokemon-species/25/"
 function idDepuisUrl(url: string): number {
   const segments = url.split("/").filter(Boolean);
   return Number(segments[segments.length - 1]);
 }
 
-export async function getPokemons(limit: number = 20): Promise<Pokemon[]> {
-  const data = await apiFetch<PokemonListApiResponse>(`/pokemon?limit=${limit}`);
+function spriteUrl(id: number): string {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+}
 
-  return data.results.map((resultat) => ({
-    id: idDepuisUrl(resultat.url),
-    nom: resultat.name,
-  }));
+export async function getPokemons(): Promise<Pokemon[]> {
+  // /pokemon-species et pas /pokemon : ce dernier inclut les méga-évolutions et formes
+  // régionales (ids 10000+) qui n'ont pas de fiche espèce → erreurs 404
+  const data = await apiFetch<PokemonListApiResponse>(`/pokemon-species?limit=1025`);
+
+  return data.results.map((resultat) => {
+    const id = idDepuisUrl(resultat.url);
+    return { id, nom: resultat.name, spriteUrl: spriteUrl(id) };
+  });
 }
 
 export async function getPokemonById(id: number | string): Promise<PokemonDetail> {
+  // Deux endpoints nécessaires (stats d'un côté, description de l'autre), lancés en
+  // parallèle : on attend le plus lent, pas la somme des deux
   const [pokemon, espece] = await Promise.all([
     apiFetch<PokemonDetailApiResponse>(`/pokemon/${id}`),
     apiFetch<PokemonSpeciesApiResponse>(`/pokemon-species/${id}`),
   ]);
 
   const descriptionEntry = espece.flavor_text_entries.find(
-    (entree) => entree.language.name === "en"
+    (entree) => entree.language.name === "fr"
   );
+  // L'API laisse des retours à la ligne et des \f (caractère d'imprimante) dans le texte
   const description = (descriptionEntry?.flavor_text ?? "")
     .replace(/[\n\f]/g, " ")
     .trim();
@@ -46,7 +56,9 @@ export async function getPokemonById(id: number | string): Promise<PokemonDetail
   return {
     id: pokemon.id,
     nom: pokemon.name,
+    spriteUrl: spriteUrl(pokemon.id),
     types: pokemon.types.map((t) => t.type.name),
+    // L'API hérite des unités des jeux : hectogrammes et décimètres
     poidsKg: pokemon.weight / 10,
     tailleM: pokemon.height / 10,
     talents: pokemon.abilities.map((a) => a.ability.name),
