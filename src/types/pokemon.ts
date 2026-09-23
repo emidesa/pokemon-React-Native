@@ -40,6 +40,7 @@ export type PokemonDetail = {
   id: number;
   nom: string;
   spriteUrl: string;
+  criUrl: string;
   types: PokemonType[];
   poidsKg: number;
   tailleM: number;

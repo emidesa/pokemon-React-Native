@@ -26,9 +26,14 @@ function spriteUrl(id: number): string {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 }
 
+// PokeAPI fournit des cris, mais en .ogg qu'iOS ne sait pas lire. Cette source les a en mp3
+function criUrl(nom: string): string {
+  return `https://play.pokemonshowdown.com/audio/cries/${nom.replace(/-/g, "")}.mp3`;
+}
+
 export async function getPokemons(): Promise<Pokemon[]> {
   // /pokemon-species et pas /pokemon : ce dernier inclut les méga-évolutions et formes
-  // régionales (ids 10000+) qui n'ont pas de fiche espèce → erreurs 404
+  // régionales qui n'ont pas de fiche espèce → erreurs 404
   const data = await apiFetch<PokemonListApiResponse>(`/pokemon-species?limit=1025`);
 
   return data.results.map((resultat) => {
@@ -46,7 +51,7 @@ export async function getPokemonById(id: number | string): Promise<PokemonDetail
   ]);
 
   const descriptionEntry = espece.flavor_text_entries.find(
-    (entree) => entree.language.name === "fr"
+    (entree) => entree.language.name === "en"
   );
   // L'API laisse des retours à la ligne et des \f (caractère d'imprimante) dans le texte
   const description = (descriptionEntry?.flavor_text ?? "")
@@ -57,6 +62,7 @@ export async function getPokemonById(id: number | string): Promise<PokemonDetail
     id: pokemon.id,
     nom: pokemon.name,
     spriteUrl: spriteUrl(pokemon.id),
+    criUrl: criUrl(pokemon.name),
     types: pokemon.types.map((t) => t.type.name),
     // L'API hérite des unités des jeux : hectogrammes et décimètres
     poidsKg: pokemon.weight / 10,

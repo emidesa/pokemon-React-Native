@@ -20,28 +20,19 @@ export function usePokemons() {
   const [nombreAffiches, setNombreAffiches] = useState(TAILLE_PAGE);
 
   useEffect(() => {
-    // Garde-fou : si on quitte l'écran pendant le chargement, le nettoyage passe "annule"
-    // à true et on évite de modifier l'état d'un composant démonté
-    let annule = false;
-
     async function charger() {
       try {
         setLoading(true);
         setError(null);
-        const pokemons = await getPokemons();
-        if (!annule) setTous(pokemons);
+        setTous(await getPokemons());
       } catch (e) {
-        if (!annule) setError(e instanceof Error ? e.message : "Erreur inconnue");
+        setError(e instanceof Error ? e.message : "Erreur inconnue");
       } finally {
-        if (!annule) setLoading(false);
+        setLoading(false);
       }
     }
 
     charger();
-
-    return () => {
-      annule = true;
-    };
   }, []);
 
   useEffect(() => {
@@ -55,7 +46,7 @@ export function usePokemons() {
     return () => clearTimeout(delai);
   }, [recherche]);
 
-  // Filtrer → trier → tronquer. useMemo évite de tout recalculer à chaque rendu.
+  // useMemo évite de tout recalculer à chaque rendu.
   const data = useMemo(() => {
     const texte = rechercheDebounced.trim().toLowerCase();
     const filtres = texte === "" ? tous : tous.filter((p) => p.nom.includes(texte));

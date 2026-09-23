@@ -2,14 +2,40 @@ import type { PokemonType } from "@/types/pokemon";
 
 export const identity = {
   primary: "#DC0A2D",
+  // Le texte posé sur une couleur de marque (bannière rouge, en-tête coloré du détail)
+  // reste blanc dans les deux thèmes : ces fonds ne changent pas
+  texteSurCouleur: "#FFFFFF",
 };
 
-export const grayscale = {
-  dark: "#212121",
-  medium: "#666666",
-  light: "#E0E0E0",
-  background: "#EFEFEF",
-  white: "#FFFFFF",
+// Noms de RÔLES et non de couleurs : "surface" peut devenir sombre, "white" non.
+// C'est ce qui rend le thème possible.
+export type Couleurs = {
+  fond: string;
+  surface: string;
+  surfaceAlt: string;
+  texte: string;
+  texteSecondaire: string;
+  bordure: string;
+};
+
+export const couleursClaires: Couleurs = {
+  fond: "#FFFFFF",
+  surface: "#FFFFFF",
+  surfaceAlt: "#EFEFEF",
+  texte: "#212121",
+  texteSecondaire: "#666666",
+  bordure: "#E0E0E0",
+};
+
+// Le type Couleurs force les deux palettes à avoir exactement les mêmes clés :
+// en oublier une en mode sombre devient une erreur de compilation
+export const couleursSombres: Couleurs = {
+  fond: "#1E1E1E",
+  surface: "#2A2A2A",
+  surfaceAlt: "#3A3A3A",
+  texte: "#FFFFFF",
+  texteSecondaire: "#AAAAAA",
+  bordure: "#444444",
 };
 
 // Texte toujours blanc sur ces couleurs (choix produit) : Bug, Electric, Fairy, Fire,

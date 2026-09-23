@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Text, View, StyleSheet } from "react-native";
-import { grayscale, spacing, radius, typography, ombres } from "@/theme";
+import { spacing, radius, typography, ombres, useTheme } from "@/theme";
+import { numeroPokedex } from "@/utils/texte";
 
 type PokemonCardProps = {
   id: number;
@@ -9,15 +10,19 @@ type PokemonCardProps = {
 };
 
 export function PokemonCard({ id, nom, spriteUrl }: PokemonCardProps) {
+  const { couleurs } = useTheme();
+
   return (
     // Deux View imbriquées : overflow "hidden" (pour couper la bande grise aux coins
     // arrondis) rognerait l'ombre s'ils étaient sur le même élément
-    <View style={styles.ombre}>
+    <View style={[styles.ombre, { backgroundColor: couleurs.surface }]}>
       <View style={styles.carte}>
-        <Text style={styles.numero}>#{String(id).padStart(3, "0")}</Text>
+        <Text style={[styles.numero, { color: couleurs.texteSecondaire }]}>
+          {numeroPokedex(id)}
+        </Text>
 
-        <View style={styles.bandeNom}>
-          <Text style={styles.nom} numberOfLines={1}>
+        <View style={[styles.bandeNom, { backgroundColor: couleurs.surfaceAlt }]}>
+          <Text style={[styles.nom, { color: couleurs.texte }]} numberOfLines={1}>
             {nom}
           </Text>
         </View>
@@ -33,7 +38,6 @@ const styles = StyleSheet.create({
   ombre: {
     ...ombres.dp2,
     borderRadius: radius.sm,
-    backgroundColor: grayscale.white,
   },
   carte: {
     aspectRatio: 104 / 108, // proportions de la maquette, sans figer une taille en pixels
@@ -43,13 +47,11 @@ const styles = StyleSheet.create({
   },
   numero: {
     ...typography.caption,
-    color: grayscale.medium,
     textAlign: "right",
     paddingTop: spacing.xs,
     paddingHorizontal: spacing.sm,
   },
   bandeNom: {
-    backgroundColor: grayscale.background,
     borderRadius: 7,
     paddingTop: spacing.xl,
     paddingBottom: spacing.xs,
@@ -57,7 +59,6 @@ const styles = StyleSheet.create({
   },
   nom: {
     ...typography.body3,
-    color: grayscale.dark,
     textAlign: "center",
   },
   image: {

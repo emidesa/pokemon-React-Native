@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-const VALEUR_MAX = 255;
+// Maximum théorique d'une stat dans les jeux Pokémon — sert d'échelle à la barre, et de
+// repère dans le label lu par VoiceOver
+export const VALEUR_MAX = 255;
 const DUREE_MS = 800;
 
 type BarreStatProps = {

@@ -8,33 +8,19 @@ export function usePokemonDetail(id: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Garde-fou contre une mise à jour d'état après démontage du composant
-    let annule = false;
-
     async function charger() {
       try {
         setLoading(true);
         setError(null);
-        const detail = await getPokemonById(id);
-        if (!annule) {
-          setData(detail);
-        }
+        setData(await getPokemonById(id));
       } catch (e) {
-        if (!annule) {
-          setError(e instanceof Error ? e.message : "Erreur inconnue");
-        }
+        setError(e instanceof Error ? e.message : "Erreur inconnue");
       } finally {
-        if (!annule) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     }
 
     charger();
-
-    return () => {
-      annule = true;
-    };
     // [id] et non [] : sans ça, passer de Bulbasaur à Charmander garderait les anciennes données
   }, [id]);
 
